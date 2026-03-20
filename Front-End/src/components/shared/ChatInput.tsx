@@ -1,7 +1,6 @@
 import { type Message } from "@/App";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { prisma } from "@/server/db";
 import { api } from "@/lib/api";
 
 type ChatInputProps = {

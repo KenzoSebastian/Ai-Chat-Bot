@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Navbar } from "./components/shared/Navbar";
 import { SideBar } from "./components/shared/SideBar";
-import { ThemeProvider } from "./components/theme-provider";
 import { ChatInput } from "./components/shared/ChatInput";
 
 export type Message = {
   id: number;
   role: "user" | "assistant";
   content: string;
-}
+};
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -27,42 +26,40 @@ function App() {
   }, [messages]);
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="flex h-screen w-screen overflow-x-hidden">
-        <SideBar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-        <div className="flex-1 flex flex-col">
-          <Navbar />
-          <div className="flex-1 overflow-y-auto p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            {/* Chat Messages */}
-            <div className="max-w-4xl mx-auto space-y-4 mb-6">
-              {messages.map((message) => (
+    <div className="flex h-screen w-screen overflow-x-hidden">
+      <SideBar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <div className="flex-1 flex flex-col">
+        <Navbar />
+        <div className="flex-1 overflow-y-auto p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {/* Chat Messages */}
+          <div className="max-w-4xl mx-auto space-y-4 mb-6">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              >
                 <div
-                  key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  className={`rounded-lg px-4 py-3 max-w-[80%] ${
+                    message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                  }`}
                 >
-                  <div
-                    className={`rounded-lg px-4 py-3 max-w-[80%] ${
-                      message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                  </div>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-
-          {/* Chat Input */}
-          <ChatInput
-            messages={messages}
-            setMessages={setMessages}
-            inputValue={inputValue}
-            setInputValue={setInputValue}
-          />
         </div>
+
+        {/* Chat Input */}
+        <ChatInput
+          messages={messages}
+          setMessages={setMessages}
+          inputValue={inputValue}
+          setInputValue={setInputValue}
+        />
       </div>
-    </ThemeProvider>
+    </div>
   );
 }
 

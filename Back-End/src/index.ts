@@ -12,17 +12,10 @@ const routes = app
   .route("/chat-history", chatHistoryRoute)
   .get("/health", (c) => c.json({ status: "ok" }));
 
-if (ENV.NODE_ENV !== "production") {
-  serve(
-    {
-      fetch: app.fetch,
-      port: 3000,
-    },
-    () => {
-      console.log("Server running on http://localhost:3000");
-    },
-  );
-}
+ENV.NODE_ENV !== "production" &&
+  serve({ fetch: app.fetch, port: 3000 }, (info) => {
+    console.log(`🚀 Server running in development mode on http://localhost:${info.port}`);
+  });
 
 export type AppType = typeof routes;
 export default app;
