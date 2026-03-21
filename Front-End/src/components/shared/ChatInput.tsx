@@ -2,6 +2,10 @@ import { type Message } from "@/App";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { api } from "@/lib/api";
+import { useSearchParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { createNewChat } from "@/services/ChatHistoryServices";
+import { queryClient } from "@/lib/query-client";
 
 type ChatInputProps = {
   messages: Message[];
@@ -11,8 +15,21 @@ type ChatInputProps = {
 };
 
 export const ChatInput = ({ messages, setMessages, inputValue, setInputValue }: ChatInputProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  const { mutate: createChat } = useMutation({
+    mutationFn: createNewChat,
+    onSuccess: (data) => {
+      setSearchParams({ id: data.id });
+      queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
+    },
+  });
   const handleSend = async () => {
+    if (searchParams.get("id") === null) {
+      createChat(inputValue.trim().substring(0, 30) || "New Chat");
+      return;
+    }
+
     const newMessage: Message = {
       id: messages.length + 1,
       role: "user",
