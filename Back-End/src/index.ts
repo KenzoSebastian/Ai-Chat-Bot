@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { ENV } from "./config/env.js";
 import chatHistoryRoute from "./route/chatHistory.js";
+import aiChatBotRoute from "./route/aiChatBot.js";
 
 const app = new Hono();
 
@@ -10,6 +11,7 @@ const routes = app
   .use(cors())
   .get("/", (c) => c.json({ message: "Hello, World!" }))
   .route("/chat-history", chatHistoryRoute)
+  .route("/ai-chat-bot", aiChatBotRoute)
   .get("/health", (c) => c.json({ status: "ok" }));
 
 ENV.NODE_ENV !== "production" &&

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.11",
+    "@openrouter/sdk": "^0.9.11",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "@prisma/extension-accelerate": "^3.0.1",

@@ -17,10 +17,10 @@ const chatHistoryRoute = app
     }
   })
   .post(async (c) => {
-    const body = await c.req.json();
+    const { title } = await c.req.json();
     try {
       const newChat: ChatHistory = await prisma.chatHistory.create({
-        data: { title: body.title },
+        data: { title },
       });
       return c.json(newChat, 201);
     } catch (error) {
@@ -28,11 +28,11 @@ const chatHistoryRoute = app
     }
   })
   .patch(async (c) => {
-    const body = await c.req.json();
+    const { id, title } = await c.req.json();
     try {
       const updateChat: ChatHistory = await prisma.chatHistory.update({
-        where: { id: body.id },
-        data: { title: body.title },
+        where: { id },
+        data: { title },
       });
       return c.json(updateChat, 201);
     } catch (error) {
@@ -40,10 +40,10 @@ const chatHistoryRoute = app
     }
   })
   .delete(async (c) => {
-    const body = await c.req.json();
+    const { id } = await c.req.json();
     try {
       await prisma.chatHistory.delete({
-        where: { id: body.id },
+        where: { id },
       });
       return c.json({ message: "Chat history deleted successfully" }, 200);
     } catch (error) {
