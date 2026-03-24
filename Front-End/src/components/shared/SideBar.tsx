@@ -1,11 +1,10 @@
-import { deleteChatHistory, getAllChatHistory } from "@/services/ChatHistoryServices";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { FilePenLine, Trash } from "lucide-react";
+import { getAllChatHistory } from "@/services/ChatHistoryServices";
+import { useQuery } from "@tanstack/react-query";
+import { FilePenLine } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { Hamburger } from "./Hamburger";
 import { SidebarSkeleton } from "./SidebarSkeleton";
-import { queryClient } from "@/lib/query-client";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
+import { PopOverChat } from "./PopOverChat";
 
 type SideBarProps = {
   isOpen: boolean;
@@ -18,14 +17,6 @@ export const SideBar = ({ isOpen, setIsOpen }: SideBarProps) => {
   const { data: chatHistories, isLoading: isLoadingChatHistories } = useQuery({
     queryKey: ["chatHistories"],
     queryFn: getAllChatHistory,
-  });
-
-  const { mutate: deleteChat } = useMutation({
-    mutationFn: deleteChatHistory,
-    onSuccess: (data) => {
-      console.log(data);
-      queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
-    },
   });
 
   const handleNewChat = () => {
@@ -68,30 +59,7 @@ export const SideBar = ({ isOpen, setIsOpen }: SideBarProps) => {
                   onClick={() => setSearchParams({ id: item.id })}
                 >
                   {item.title}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Trash className="absolute right-3 top-1/2 -translate-y-1/2 w-5 hover:scale-110 transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100" />
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>yang bener bang, mau dihapus nih chat?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          kalo dihapus gak bakal ada lagi, siapa tau chat ini akan penting buat nanti, kamu pikirkan baik baik ya
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteChat(item.id);
-                          }}
-                        >
-                          Hapus
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <PopOverChat id={item.id} />
                 </li>
               ))}
           </ul>

@@ -7,8 +7,10 @@ const app = new Hono();
 const chatHistoryRoute = app
   .get(async (c) => {
     try {
-      const data: ChatHistory[] = await prisma.chatHistory.findMany();
-      return c.json(data);
+      const data: ChatHistory[] = await prisma.chatHistory.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+      return c.json(data, 200);
     } catch (error) {
       console.error("Error fetching chat histories:", error);
       return c.json({ error: "Failed to fetch chat histories" }, 500);
@@ -17,12 +19,35 @@ const chatHistoryRoute = app
   .post(async (c) => {
     const body = await c.req.json();
     try {
-      const newChat = await prisma.chatHistory.create({
+      const newChat: ChatHistory = await prisma.chatHistory.create({
         data: { title: body.title },
       });
       return c.json(newChat, 201);
     } catch (error) {
       return c.json({ error: "Failed to create chat history", message: error }, 500);
+    }
+  })
+  .patch(async (c) => {
+    const body = await c.req.json();
+    try {
+      const updateChat: ChatHistory = await prisma.chatHistory.update({
+        where: { id: body.id },
+        data: { title: body.title },
+      });
+      return c.json(updateChat, 201);
+    } catch (error) {
+      return c.json({ error: "Failed to update chat history", message: error }, 500);
+    }
+  })
+  .delete(async (c) => {
+    const body = await c.req.json();
+    try {
+      await prisma.chatHistory.delete({
+        where: { id: body.id },
+      });
+      return c.json({ message: "Chat history deleted successfully" }, 200);
+    } catch (error) {
+      return c.json({ error: "Failed to delete chat history", message: error }, 500);
     }
   });
 

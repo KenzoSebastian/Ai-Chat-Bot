@@ -32,6 +32,25 @@ export const createNewChat = async (title: string) => {
   return await response.json();
 };
 
+export const updateChatHistory = async ({ id, title }: { id: string; title: string }) => {
+  const response = await api["chat-history"].$patch({
+    json: {
+      id,
+      title,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+
+    throw {
+      status: response.status,
+      message: errorData || "Something went wrong while updating chat.",
+    };
+  }
+  return await response.json();
+};
+
 export const deleteChatHistory = async (id: string) => {
   const response = await api["chat-history"].$delete({
     json: {
