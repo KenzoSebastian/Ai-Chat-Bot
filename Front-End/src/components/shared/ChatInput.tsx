@@ -1,11 +1,11 @@
 import { type Message } from "@/App";
+import { queryClient } from "@/lib/query-client";
+import { streamChatResponse } from "@/services/AiServices";
+import { createNewChat } from "@/services/ChatHistoryServices";
+import { useMutation } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { api } from "@/lib/api";
-import { useSearchParams } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import { createNewChat } from "@/services/ChatHistoryServices";
-import { queryClient } from "@/lib/query-client";
 
 type ChatInputProps = {
   messages: Message[];
@@ -24,34 +24,37 @@ export const ChatInput = ({ messages, setMessages, inputValue, setInputValue }: 
       queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
     },
   });
+
+  const { mutate: stream } = useMutation({
+    mutationFn: (msg: Message[]) =>
+      streamChatResponse(msg, (text) => {
+        setMessages((prev) => {
+          // 1. Ambil semua pesan kecuali yang paling terakhir
+          const otherMessages = prev.slice(0, -1);
+          // 2. Ambil pesan terakhir (si asisten yang lagi ngetik)
+          const lastMessage = prev[prev.length - 1];
+
+          // 3. Return array baru dengan pesan terakhir yang diupdate kontennya
+          return [...otherMessages, { ...lastMessage, content: text }];
+        });
+      }),
+  });
   const handleSend = async () => {
     if (searchParams.get("id") === null) {
       createChat(inputValue.trim().substring(0, 30) || "New Chat");
       return;
     }
+    if (inputValue.trim() === "") return;
 
-    const newMessage: Message = {
-      id: messages.length + 1,
-      role: "user",
-      content: inputValue,
-    };
+    const userMsg: Message = { id: Date.now(), role: "user", content: inputValue };
+    const aiMsg: Message = { id: Date.now() + 1, role: "assistant", content: "..." };
 
-    setMessages([...messages, newMessage]);
+    // Tambahin user & wadah buat AI ke UI
+    setMessages((prev) => [...prev, userMsg, aiMsg]);
     setInputValue("");
 
-    const response = await api["chat-history"].$get();
-    const data = await response.json();
-    console.log(data);
-
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: messages.length + 2,
-        role: "assistant",
-        content: "This is a simulated response. Connect to an AI API to get real responses.",
-      };
-      setMessages((prev) => [...prev, aiResponse]);
-    }, 1000);
+    // Baru jalankan streamingnya
+    stream(messages);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

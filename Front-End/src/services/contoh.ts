@@ -9,7 +9,7 @@ export interface ChatMessage {
   content: string;
 }
 
-export const sendChatMessage = async (
+export const contoh = async (
   messages: ChatMessage[],
   onStream?: (chunk: string) => void
 ): Promise<string> => {
