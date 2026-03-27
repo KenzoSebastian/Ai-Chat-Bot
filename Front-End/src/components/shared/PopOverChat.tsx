@@ -36,8 +36,8 @@ export const PopOverChat = ({ id }: { id: string }) => {
 
   const { mutate: updateChat } = useMutation({
     mutationFn: updateChatHistory,
-    onSuccess: () => {
-      toast.success("Update chat successfully!");
+    onSuccess: (res) => {
+      toast.success(res.message);
       setUpdateAlert(false);
       setOpenPopOver(false);
       queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
@@ -46,8 +46,8 @@ export const PopOverChat = ({ id }: { id: string }) => {
 
   const { mutate: deleteChat } = useMutation({
     mutationFn: deleteChatHistory,
-    onSuccess: () => {
-      toast.success("Delete chat successfully!");
+    onSuccess: (res) => {
+      toast.success(res.message);
       setOpenPopOver(false);
       queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
     },

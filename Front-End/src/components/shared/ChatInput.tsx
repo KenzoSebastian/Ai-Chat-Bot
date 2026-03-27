@@ -19,8 +19,8 @@ export const ChatInput = ({ messages, setMessages, inputValue, setInputValue }: 
 
   const { mutate: createChat } = useMutation({
     mutationFn: createNewChat,
-    onSuccess: (data) => {
-      setSearchParams({ id: data.id });
+    onSuccess: (res) => {
+      setSearchParams({ id: res.data.id });
       queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
     },
   });

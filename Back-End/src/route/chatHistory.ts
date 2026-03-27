@@ -10,7 +10,7 @@ const chatHistoryRoute = app
       const data: ChatHistory[] = await prisma.chatHistory.findMany({
         orderBy: { createdAt: "desc" },
       });
-      return c.json(data, 200);
+      return c.json({mesage: "Chat histories fetched successfully", data}, 200);
     } catch (error) {
       console.error("Error fetching chat histories:", error);
       return c.json({ error: "Failed to fetch chat histories" }, 500);
@@ -22,7 +22,7 @@ const chatHistoryRoute = app
       const newChat: ChatHistory = await prisma.chatHistory.create({
         data: { title },
       });
-      return c.json(newChat, 201);
+      return c.json({message: "Chat history created successfully", data: newChat}, 201);
     } catch (error) {
       return c.json({ error: "Failed to create chat history", message: error }, 500);
     }
@@ -34,7 +34,7 @@ const chatHistoryRoute = app
         where: { id },
         data: { title },
       });
-      return c.json(updateChat, 201);
+      return c.json({message: "Chat history updated successfully", data: updateChat}, 201);
     } catch (error) {
       return c.json({ error: "Failed to update chat history", message: error }, 500);
     }

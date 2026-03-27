@@ -51,8 +51,8 @@ export const SideBar = ({ isOpen, setIsOpen }: SideBarProps) => {
             >
               Chat History
             </p>
-            {Array.isArray(chatHistories) &&
-              chatHistories.map((item) => (
+            {!!chatHistories && !!chatHistories.data && Array.isArray(chatHistories.data) &&
+              chatHistories.data.map((item) => (
                 <li
                   key={item.id}
                   className={`py-3 group text-nowrap cursor-pointer block overflow-hidden transition-all relative duration-300 ease-in-out ${isOpen ? "w-full px-5" : "w-0 p-0"} ${item.id === searchParams.get("id") ? "bg-popover text-white" : "hover:bg-muted"}`}
