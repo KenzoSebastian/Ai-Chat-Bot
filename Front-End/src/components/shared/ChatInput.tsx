@@ -29,12 +29,8 @@ export const ChatInput = ({ messages, setMessages, inputValue, setInputValue }: 
     mutationFn: (msg: Message[]) =>
       streamChatResponse(msg, (text) => {
         setMessages((prev) => {
-          // 1. Ambil semua pesan kecuali yang paling terakhir
           const otherMessages = prev.slice(0, -1);
-          // 2. Ambil pesan terakhir (si asisten yang lagi ngetik)
           const lastMessage = prev[prev.length - 1];
-
-          // 3. Return array baru dengan pesan terakhir yang diupdate kontennya
           return [...otherMessages, { ...lastMessage, content: text }];
         });
       }),
@@ -49,11 +45,9 @@ export const ChatInput = ({ messages, setMessages, inputValue, setInputValue }: 
     const userMsg: Message = { id: Date.now(), role: "user", content: inputValue };
     const aiMsg: Message = { id: Date.now() + 1, role: "assistant", content: "..." };
 
-    // Tambahin user & wadah buat AI ke UI
     setMessages((prev) => [...prev, userMsg, aiMsg]);
     setInputValue("");
 
-    // Baru jalankan streamingnya
     stream(messages);
   };
 
