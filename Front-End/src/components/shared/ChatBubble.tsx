@@ -20,7 +20,6 @@ export const ChatBubble = ({ messages, messagesEndRef }: ChatBubbleProps) => {
           >
             <Markdown
               components={{
-                // Tambahkan mb-4 (margin bottom) supaya antar paragraf ada jeda
                 p: ({ children }) => (
                   <p className="prose dark:prose-invert max-w-none mb-5 last:mb-0 leading-relaxed">
                     {children}
@@ -38,7 +37,6 @@ export const ChatBubble = ({ messages, messagesEndRef }: ChatBubbleProps) => {
                       language={match[1]}
                       style={atomDark}
                       customStyle={{
-                        // Tambahkan margin vertikal (atas-bawah) di kotak kode
                         margin: "1.5rem 0",
                         borderRadius: "12px",
                         fontSize: "0.85rem",

@@ -6,9 +6,27 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ASSISTANT
+}
+
 model ChatHistory {
   id        String   @id @default(cuid())
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  messages Message[]
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  chatHistoryId String
+  role          Role
+  content       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  chatHistory ChatHistory @relation(fields: [chatHistoryId], references: [id])
 }
