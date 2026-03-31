@@ -1,12 +1,21 @@
-import { Message } from "@/App";
 import { api } from "@/lib/api";
+import { Message } from "@/lib/type";
 
 export const streamChatResponse = async (
-  messages: Message[],
+  messages: Message,
   onChunk: (text: string) => void,
 ) => {
+  if (!messages) return;
+  
+  const messageFiltered = messages.map((msg) => ({
+    role: msg.role === "USER" ? "user" : "assistant",
+    content: msg.content,
+  }));
+
+  console.log(messages);
+
   const response = await api["ai-chat-bot"].$post({
-    json: messages,
+    json: messageFiltered,
   });
 
   if (!response.ok) throw new Error("Gagal!");

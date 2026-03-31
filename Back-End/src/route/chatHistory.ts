@@ -19,11 +19,12 @@ const chatHistoryRoute = app
   .post(async (c) => {
     const { title } = await c.req.json();
     try {
-      const newChat: ChatHistory = await prisma.chatHistory.create({
+      const newChatHistory: ChatHistory = await prisma.chatHistory.create({
         data: { title },
       });
-      return c.json({message: "Chat history created successfully", data: newChat}, 201);
+      return c.json({message: "Chat history created successfully", data: newChatHistory}, 201);
     } catch (error) {
+      console.error("Error creating chat history:", error);
       return c.json({ error: "Failed to create chat history", message: error }, 500);
     }
   })
@@ -36,6 +37,7 @@ const chatHistoryRoute = app
       });
       return c.json({message: "Chat history updated successfully", data: updateChat}, 201);
     } catch (error) {
+      console.error("Error updating chat history:", error);
       return c.json({ error: "Failed to update chat history", message: error }, 500);
     }
   })
@@ -47,6 +49,7 @@ const chatHistoryRoute = app
       });
       return c.json({ message: "Chat history deleted successfully" }, 200);
     } catch (error) {
+      console.error("Error deleting chat history:", error);
       return c.json({ error: "Failed to delete chat history", message: error }, 500);
     }
   });
