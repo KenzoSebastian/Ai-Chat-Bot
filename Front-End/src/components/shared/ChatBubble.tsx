@@ -1,10 +1,10 @@
-import { Message } from "@/lib/type";
+import { AiRequest } from "@/lib/type";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 type ChatBubbleProps = {
-  messages: Message;
+  messages: AiRequest[];
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
 };
 
@@ -12,10 +12,10 @@ export const ChatBubble = ({ messages, messagesEndRef }: ChatBubbleProps) => {
   return (
     <div className="max-w-4xl mx-auto space-y-4 mb-6">
       {messages.map((message) => (
-        <div key={message.id} className={`flex ${message.role === "USER" ? "justify-end" : "justify-start"}`}>
+        <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
           <div
             className={`rounded-lg px-4 py-3 max-w-[80%] ${
-              message.role === "USER" ? "bg-primary text-primary-foreground" : "bg-muted"
+              message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
             }`}
           >
             <Markdown

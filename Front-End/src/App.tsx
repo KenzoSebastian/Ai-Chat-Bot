@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "./components/shared/ChatInput";
 import { Navbar } from "./components/shared/Navbar";
@@ -6,20 +7,13 @@ import { ChatBubble } from "./components/shared/ChatBubble";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMessageByChatHistoryId } from "./services/messageServices";
 import { useSearchParams } from "react-router-dom";
-
-// export type Message = {
-//   id: number;
-//   role: "user" | "assistant";
-//   content: string;
-// };
+import { AiRequest } from "./lib/type";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchParams] = useSearchParams();
+  const [aiRequest, setAiRequest] = useState<AiRequest[]>([]);
 
-  // const [messages, setMessages] = useState<Message[]>([
-  //   { id: 1, role: "assistant", content: "Hello! How can I help you today?" },
-  // ]);
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -27,14 +21,24 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const { data: messages } = useQuery({
+  const { data: messages, refetch } = useQuery({
     queryKey: ["messages", searchParams.get("id")],
     queryFn: () => fetchMessageByChatHistoryId(searchParams.get("id")!),
   });
 
   useEffect(() => {
-    scrollToBottom();
+    setAiRequest(
+      messages?.data.map((msg) => ({
+        id: msg.id,
+        role: msg.role === "USER" ? "user" : "assistant",
+        content: msg.content,
+      })) || [],
+    );
   }, [messages]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [aiRequest]);
 
   return (
     <div className="flex h-screen w-screen overflow-x-hidden">
@@ -44,17 +48,18 @@ function App() {
         {!!messages && (
           <div className="flex-1 overflow-y-auto p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {/* Chat Messages */}
-            <ChatBubble messages={messages.data} messagesEndRef={messagesEndRef} />
+            <ChatBubble messages={aiRequest} messagesEndRef={messagesEndRef} />
           </div>
         )}
 
         {/* Chat Input */}
         {!!messages && (
           <ChatInput
-            messages={messages.data}
-            // setMessages={setMessages}
+            aiRequest={aiRequest}
+            setAiRequest={setAiRequest}
             inputValue={inputValue}
             setInputValue={setInputValue}
+            refetch={refetch}
           />
         )}
       </div>

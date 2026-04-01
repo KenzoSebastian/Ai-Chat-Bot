@@ -1,23 +1,29 @@
 import { queryClient } from "@/lib/query-client";
+import { AiRequest } from "@/lib/type";
 import { streamChatResponse } from "@/services/AiServices";
 import { createNewChat } from "@/services/ChatHistoryServices";
+import { createMessage } from "@/services/messageServices";
 import { useMutation } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { createMessage } from "@/services/messageServices";
-import { Message } from "@/lib/type";
 
 type ChatInputProps = {
-  messages: Message;
-  // setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  aiRequest: AiRequest[];
+  setAiRequest: React.Dispatch<React.SetStateAction<AiRequest[]>>;
   inputValue: string;
   setInputValue: React.Dispatch<React.SetStateAction<string>>;
+  refetch: () => void;
 };
 
-export const ChatInput = ({ messages, inputValue, setInputValue }: ChatInputProps) => {
+export const ChatInput = ({
+  aiRequest,
+  setAiRequest,
+  inputValue,
+  setInputValue,
+  refetch,
+}: ChatInputProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  // buat nnti deh, ini kyknya pke usestate
 
   const { mutate: createChat } = useMutation({
     mutationFn: createNewChat,
@@ -32,24 +38,13 @@ export const ChatInput = ({ messages, inputValue, setInputValue }: ChatInputProp
   });
 
   const { mutateAsync: stream } = useMutation({
-    mutationFn: (msg: Message) =>
+    mutationFn: (msg: AiRequest[]) =>
       streamChatResponse(msg, (text) => {
-        mutateCreateMessage({
-          chatHistoryId: searchParams.get("id")!,
-          role: "ASSISTANT",
-          content: text,
+        setAiRequest((prev) => {
+          const lastMsg = prev[prev.length - 1];
+          const newMsg = { ...lastMsg, content: text };
+          return [...prev.slice(0, -1), newMsg];
         });
-        // queryClient.setQueryData(["messages", searchParams.get("id")], (oldData: any) => {
-        //   if (!oldData) return [msg, { ...msg, content: text, role: "ASSISTANT" }];
-        //   const updatedMessages = [...oldData];
-        //   const lastMessage = updatedMessages[updatedMessages.length - 1];
-        //   if (lastMessage.role === "user") {
-        //     lastMessage.content = text;
-        //   } else {
-        //     updatedMessages.push({ ...msg, content: text, role: "ASSISTANT" });
-        //   }
-        //   return updatedMessages;
-        // });
       }),
   });
 
@@ -60,19 +55,28 @@ export const ChatInput = ({ messages, inputValue, setInputValue }: ChatInputProp
     }
     if (inputValue.trim() === "") return;
 
-    // const userMsg: Message = { id: Date.now(), role: "user", content: inputValue };
-    // const aiMsg: Message = { id: Date.now() + 1, role: "assistant", content: "..." };
+    const userMsg: AiRequest = { id: Date.now().toString(), role: "user", content: inputValue };
+    const aiMsg: AiRequest = { id: (Date.now() + 1).toString(), role: "assistant", content: "thinking..." };
 
-    // setMessages((prev) => [...prev, userMsg, aiMsg]);
+    const updatedHistoryRequest = [...aiRequest, userMsg];
+
+    setAiRequest([...updatedHistoryRequest, aiMsg]);
+    console.log(updatedHistoryRequest);
     setInputValue("");
     await mutateCreateMessage({
       chatHistoryId: searchParams.get("id")!,
       role: "USER",
       content: inputValue.trim(),
     });
-    console.log(messages);
-    const aiResponse = await stream(messages);
-    console.log(aiResponse);
+    const aiResponse = await stream(updatedHistoryRequest);
+    if (typeof aiResponse === "string") {
+      await mutateCreateMessage({
+        chatHistoryId: searchParams.get("id")!,
+        role: "ASSISTANT",
+        content: aiResponse,
+      });
+    }
+    refetch();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
