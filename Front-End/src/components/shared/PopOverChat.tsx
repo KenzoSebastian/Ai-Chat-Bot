@@ -42,6 +42,11 @@ export const PopOverChat = ({ id }: { id: string }) => {
       setOpenPopOver(false);
       queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
     },
+    onError: (err) => {
+      if (typeof err.message === "object") {
+        toast.error(err.message["error"] || "something went wrong");
+      }
+    },
   });
 
   const { mutate: deleteChat } = useMutation({
@@ -50,6 +55,11 @@ export const PopOverChat = ({ id }: { id: string }) => {
       toast.success(res.message);
       setOpenPopOver(false);
       queryClient.invalidateQueries({ queryKey: ["chatHistories"] });
+    },
+    onError: (err) => {
+      if (typeof err.message === "object") {
+        toast.error(err.message["error"] || "something went wrong");
+      }
     },
   });
 
