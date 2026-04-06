@@ -28,5 +28,5 @@ model Message {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  chatHistory ChatHistory @relation(fields: [chatHistoryId], references: [id])
+  chatHistory ChatHistory @relation(fields: [chatHistoryId], references: [id], onDelete: Cascade)
 }

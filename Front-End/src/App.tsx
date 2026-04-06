@@ -23,7 +23,11 @@ function App() {
 
   const { data: messages, refetch } = useQuery({
     queryKey: ["messages", searchParams.get("id")],
-    queryFn: () => fetchMessageByChatHistoryId(searchParams.get("id")!),
+    queryFn: async () => {
+      const id = searchParams.get("id");
+      if (!id) return { message: "", data: [] };
+      return fetchMessageByChatHistoryId(id);
+    },
   });
 
   useEffect(() => {
