@@ -61,7 +61,6 @@ export const ChatInput = ({
     const updatedHistoryRequest = [...aiRequest, userMsg];
 
     setAiRequest([...updatedHistoryRequest, aiMsg]);
-    console.log(updatedHistoryRequest);
     setInputValue("");
     await mutateCreateMessage({
       chatHistoryId: searchParams.get("id")!,

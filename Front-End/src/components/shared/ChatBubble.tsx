@@ -2,6 +2,7 @@ import { AiRequest } from "@/lib/type";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import remarkGfm from "remark-gfm";
 
 type ChatBubbleProps = {
   messages: AiRequest[];
@@ -19,6 +20,7 @@ export const ChatBubble = ({ messages, messagesEndRef }: ChatBubbleProps) => {
             }`}
           >
             <Markdown
+            remarkPlugins={[remarkGfm]}
               components={{
                 p: ({ children }) => (
                   <p className="prose dark:prose-invert max-w-none mb-5 last:mb-0 leading-relaxed">

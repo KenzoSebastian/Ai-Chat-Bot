@@ -7,10 +7,10 @@ export const streamChatResponse = async (
 ) => {
   if (!messages) return;
 
-  console.log(messages);
+  const messageSlice = messages.slice(-30); // Ambil 30 pesan terakhir untuk konteks
 
   const response = await api["ai-chat-bot"].$post({
-    json: messages,
+    json: messageSlice,
   });
 
   if (!response.ok) throw new Error("Gagal!");
